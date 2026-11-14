@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b8a19e4caf1167f1cbe34c983f1e493, type: 3}
+  m_Name: TrashData_PilaUsada
+  m_EditorClassIdentifier: Assembly-CSharp::EcoGenesis.Data.TrashData
+  displayName: Pila usada
+  icon: {fileID: 0}
+  wasteType: 4
+  tint: {r: 0.7529412, g: 0.22352941, b: 0.16862746, a: 1}
+  points: 20
+  wrongPenalty: 5
+  restorationWeight: 1.5
+  recyclingTip: "Las pilas son peligrosas: van al contenedor rojo, nunca a la basura com\xFAn."
