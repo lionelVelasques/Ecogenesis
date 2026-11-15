@@ -7,7 +7,7 @@ namespace EcoGenesis.Missions
 {
     /// <summary>
     /// Gestor de misiones: lleva el progreso de las misiones activas escuchando eventos de recolección
-    /// y clasificación, y publica las misiones completadas.
+    /// y clasificación, y publica las misiones completadas. Expone el estado para guardar y cargar.
     /// </summary>
     public class MissionManager : MonoBehaviour
     {
@@ -19,6 +19,7 @@ namespace EcoGenesis.Missions
         private readonly HashSet<string> completed = new HashSet<string>();
 
         public IReadOnlyList<MissionRuntime> Active => active;
+        public IEnumerable<string> CompletedIds => completed;
 
         private void OnEnable()
         {
@@ -50,6 +51,19 @@ namespace EcoGenesis.Missions
             GameEvents.RaiseMessage("Nueva misión: " + mission.title);
             NotifyUpdated();
             return true;
+        }
+
+        /// <summary>Reemplaza el estado actual (al cargar una partida guardada).</summary>
+        public void RestoreState(IEnumerable<string> completedIds, IEnumerable<MissionRuntime> restored)
+        {
+            active.Clear();
+            completed.Clear();
+            if (completedIds != null)
+            {
+                foreach (string id in completedIds) completed.Add(id);
+            }
+            if (restored != null) active.AddRange(restored);
+            NotifyUpdated();
         }
 
         private void OnTrashCollected(TrashData data) => Dispatch(ObjectiveType.CollectTrash, data);
