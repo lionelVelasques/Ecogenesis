@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7fa93c4d12d031dd41987eca1eb6d314, type: 3}
+  m_Name: L3_M2
+  m_EditorClassIdentifier: Assembly-CSharp::EcoGenesis.Data.MissionData
+  missionId: l3_m2
+  title: Sin pilas en el mercado
+  description: 
+  startDialogue: "Alguien tir\xF3 pilas junto a los puestos. No pueden ir a la basura com\xFAn."
+  completeDialogue: "Mercado m\xE1s seguro para todos."
+  objectives:
+  - type: 0
+    anyWasteType: 0
+    wasteType: 4
+    requiredAmount: 4
+  - type: 1
+    anyWasteType: 0
+    wasteType: 4
+    requiredAmount: 4
+  sequential: 0
+  rewardPoints: 100
+  restorationBonus: 3
+  nextMission: {fileID: 11400000, guid: 32b40bc091b20a440999b32909121797, type: 2}

@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7fa93c4d12d031dd41987eca1eb6d314, type: 3}
+  m_Name: L3_M1
+  m_EditorClassIdentifier: Assembly-CSharp::EcoGenesis.Data.MissionData
+  missionId: l3_m1
+  title: "Restos org\xE1nicos"
+  description: 
+  startDialogue: "Los restos de fruta y verdura se pueden convertir en compost. Recoge los org\xE1nicos primero."
+  completeDialogue: "\xA1Con eso haremos compost para el parque!"
+  objectives:
+  - type: 0
+    anyWasteType: 0
+    wasteType: 0
+    requiredAmount: 6
+  - type: 1
+    anyWasteType: 0
+    wasteType: 0
+    requiredAmount: 6
+  sequential: 0
+  rewardPoints: 80
+  restorationBonus: 2
+  nextMission: {fileID: 11400000, guid: e07876096cee9034a931cc033e6e34c7, type: 2}

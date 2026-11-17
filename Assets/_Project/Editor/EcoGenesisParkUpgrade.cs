@@ -24,17 +24,20 @@ namespace EcoGenesis.EditorTools
         private const string ScenePath = Root + "/Scenes/Park_Prototype.unity";
 
         // Paleta del GDD
-        private static readonly Color Green = Hex("#4F8B57");
-        private static readonly Color Blue = Hex("#4A91B8");
-        private static readonly Color Earth = Hex("#94734E");
-        private static readonly Color Cream = Hex("#E9D9B4");
-        private static readonly Color Grey = Hex("#555D61");
+        internal static readonly Color Green = Hex("#4F8B57");
+        internal static readonly Color Blue = Hex("#4A91B8");
+        internal static readonly Color Earth = Hex("#94734E");
+        internal static readonly Color Cream = Hex("#E9D9B4");
+        internal static readonly Color Grey = Hex("#555D61");
 
-        private static readonly Dictionary<string, Mesh> meshes = new Dictionary<string, Mesh>();
-        private static readonly Dictionary<string, Material> materials = new Dictionary<string, Material>();
-        private static System.Random rng;
+        internal static readonly Dictionary<string, Mesh> meshes = new Dictionary<string, Mesh>();
+        internal static readonly Dictionary<string, Material> materials = new Dictionary<string, Material>();
+        internal static System.Random rng;
+        internal static int Seed = 11;
+        internal static float? BlockZ;
+        internal static bool BlockMarket;
 
-        private sealed class Style
+        internal sealed class Style
         {
             public Color shirt, vest, pants, boots, gloves, skin, hair;
             public bool hasVest = true, longHair, backpack, strawHat, clipboard, shovel;
@@ -51,7 +54,7 @@ namespace EcoGenesis.EditorTools
             EnsureFolder(MeshFolder);
 
             EcoGenesisSetupTool.BuildPrototypeScene(); // escena base limpia con sistemas, HUD y misiones
-            rng = new System.Random(11);
+            rng = new System.Random(Seed);
 
             Scene scene = SceneManager.GetActiveScene();
             GameObject ground = FindRoot(scene, "Ground");
@@ -101,25 +104,25 @@ namespace EcoGenesis.EditorTools
 
         // ------------------------------------------------------------------ ESCENARIO
 
-        private static void UpgradeGround(GameObject ground)
+        internal static void UpgradeGround(GameObject ground)
         {
             ground.transform.localScale = new Vector3(80f, 1f, 80f);
             var rend = ground.GetComponent<MeshRenderer>();
-            rend.sharedMaterial = Mat(Grey);
+            rend.sharedMaterial = Mat(Hex("#7C8685"));
             var rp = ground.AddComponent<RestorationProp>();
             rp.Configure(0f, 0.9f, 1f, 1f);
-            rp.AddPart(rend, Grey, Hex("#7DB07A"));
+            rp.AddPart(rend, Hex("#7C8685"), Hex("#7DB07A"));
         }
 
-        private static void BuildPaths(Transform parent)
+        internal static void BuildPaths(Transform parent)
         {
-            Color dead = Hex("#5F6366");
+            Color dead = Hex("#828789");
             Color clean = Hex("#D9C59A");
             MakeFlatSlab(parent, "Path_Z", new Vector3(3f, 0.05f, 76f), new Vector3(0f, 0f, 0f), dead, clean);
             MakeFlatSlab(parent, "Path_X", new Vector3(76f, 0.05f, 3f), new Vector3(0f, 0f, 0f), dead, clean);
         }
 
-        private static void MakeFlatSlab(Transform parent, string name, Vector3 size, Vector3 pos, Color dead, Color clean)
+        internal static void MakeFlatSlab(Transform parent, string name, Vector3 size, Vector3 pos, Color dead, Color clean)
         {
             GameObject slab = Add(parent, name, Box(size.x, size.y, size.z), dead, pos);
             var rp = slab.AddComponent<RestorationProp>();
@@ -127,15 +130,15 @@ namespace EcoGenesis.EditorTools
             rp.AddPart(slab.GetComponent<MeshRenderer>(), dead, clean);
         }
 
-        private static void BuildFountain(Transform parent)
+        internal static void BuildFountain(Transform parent)
         {
             parent.position = new Vector3(0f, 0f, 28f);
             Color stone = Hex("#8A8F91");
 
-            GameObject plaza = Add(parent, "Plaza", Frustum(5f, 5f, 0.07f, 24), Hex("#5F6366"), Vector3.zero);
+            GameObject plaza = Add(parent, "Plaza", Frustum(5f, 5f, 0.07f, 24), Hex("#828789"), Vector3.zero);
             var plazaRp = plaza.AddComponent<RestorationProp>();
             plazaRp.Configure(0.05f, 0.7f, 1f, 1f);
-            plazaRp.AddPart(plaza.GetComponent<MeshRenderer>(), Hex("#5F6366"), Cream);
+            plazaRp.AddPart(plaza.GetComponent<MeshRenderer>(), Hex("#828789"), Cream);
 
             Add(parent, "Basin", Frustum(2.4f, 2.2f, 0.6f, 16), stone, new Vector3(0f, 0.07f, 0f));
             GameObject water = Add(parent, "Water", Frustum(2.15f, 2.15f, 0.04f, 16, false, true), Hex("#6B5A3C"), new Vector3(0f, 0.6f, 0f));
@@ -157,9 +160,9 @@ namespace EcoGenesis.EditorTools
             col.height = 1f;
         }
 
-        private static void BuildHedges(Transform parent)
+        internal static void BuildHedges(Transform parent)
         {
-            Color dead = Hex("#5C5F58");
+            Color dead = Hex("#7B7F73");
             Color clean = Hex("#3F7A4A");
             MakeHedge(parent, "Hedge_N", new Vector3(80f, 1.6f, 1.2f), new Vector3(0f, 0f, 38f), dead, clean);
             MakeHedge(parent, "Hedge_S", new Vector3(80f, 1.6f, 1.2f), new Vector3(0f, 0f, -38f), dead, clean);
@@ -167,7 +170,7 @@ namespace EcoGenesis.EditorTools
             MakeHedge(parent, "Hedge_W", new Vector3(1.2f, 1.6f, 80f), new Vector3(-38f, 0f, 0f), dead, clean);
         }
 
-        private static void MakeHedge(Transform parent, string name, Vector3 size, Vector3 pos, Color dead, Color clean)
+        internal static void MakeHedge(Transform parent, string name, Vector3 size, Vector3 pos, Color dead, Color clean)
         {
             GameObject hedge = Add(parent, name, Box(size.x, size.y, size.z), dead, pos);
             var col = hedge.AddComponent<BoxCollider>();
@@ -178,11 +181,11 @@ namespace EcoGenesis.EditorTools
             rp.AddPart(hedge.GetComponent<MeshRenderer>(), dead, clean);
         }
 
-        private static void BuildTrees(Transform parent, int count)
+        internal static void BuildTrees(Transform parent, int count)
         {
             Color[] greens = { Green, Hex("#5E9C64"), Hex("#3F7A4A"), Hex("#6FAE6B") };
-            Color deadCrown = Hex("#6C6A60");
-            Color deadTrunk = Hex("#5A5248");
+            Color deadCrown = Hex("#8F8C7C");
+            Color deadTrunk = Hex("#76695A");
 
             for (int i = 0; i < count; i++)
             {
@@ -229,10 +232,10 @@ namespace EcoGenesis.EditorTools
             }
         }
 
-        private static void BuildBushes(Transform parent, int count)
+        internal static void BuildBushes(Transform parent, int count)
         {
             Color[] greens = { Green, Hex("#5E9C64"), Hex("#3F7A4A") };
-            Color dead = Hex("#66695F");
+            Color dead = Hex("#858879");
             for (int i = 0; i < count; i++)
             {
                 Vector3 p = Spot(35f, true);
@@ -251,10 +254,10 @@ namespace EcoGenesis.EditorTools
             }
         }
 
-        private static void BuildFlowers(Transform parent, int count)
+        internal static void BuildFlowers(Transform parent, int count)
         {
             Color[] blooms = { Cream, Blue, Hex("#E8A0A0"), Hex("#F2C14E") };
-            Color dead = Hex("#6B6F5E");
+            Color dead = Hex("#8A8E78");
             for (int i = 0; i < count; i++)
             {
                 Vector3 p = Spot(35f, true);
@@ -277,7 +280,7 @@ namespace EcoGenesis.EditorTools
             }
         }
 
-        private static void BuildTufts(Transform parent, int count)
+        internal static void BuildTufts(Transform parent, int count)
         {
             Color dead = Hex("#7B745A");
             Color clean = Hex("#6FAE6B");
@@ -300,7 +303,7 @@ namespace EcoGenesis.EditorTools
             }
         }
 
-        private static void BuildRocks(Transform parent, int count)
+        internal static void BuildRocks(Transform parent, int count)
         {
             Color[] greys = { Hex("#7A7F82"), Hex("#8A8F91"), Hex("#6E7376") };
             for (int i = 0; i < count; i++)
@@ -314,7 +317,7 @@ namespace EcoGenesis.EditorTools
             }
         }
 
-        private static void BuildBenches(Transform parent)
+        internal static void BuildBenches(Transform parent)
         {
             // (x, z, rotación Y): la banca mira hacia el sendero.
             float[][] spots =
@@ -322,7 +325,7 @@ namespace EcoGenesis.EditorTools
                 new[] { 3.2f, -8f, 270f }, new[] { -3.2f, -16f, 90f }, new[] { 3.2f, 17f, 270f }, new[] { -3.2f, 22f, 90f },
                 new[] { 10f, 3.2f, 180f }, new[] { -12f, -3.2f, 0f }, new[] { 22f, -3.2f, 0f }, new[] { -22f, 3.2f, 180f }
             };
-            Color dead = Hex("#5E5A52");
+            Color dead = Hex("#7D786C");
             for (int i = 0; i < spots.Length; i++)
             {
                 var bench = new GameObject("Bench_" + i);
@@ -345,7 +348,7 @@ namespace EcoGenesis.EditorTools
             }
         }
 
-        private static void BuildLamps(Transform parent)
+        internal static void BuildLamps(Transform parent)
         {
             float[][] spots =
             {
@@ -383,7 +386,7 @@ namespace EcoGenesis.EditorTools
             }
         }
 
-        private static void BuildPollutionPiles(Transform parent, int count)
+        internal static void BuildPollutionPiles(Transform parent, int count)
         {
             Color[] dull = { Hex("#6E7276"), Hex("#7A6F5F"), Hex("#5A6468"), Hex("#85796A") };
             for (int i = 0; i < count; i++)
@@ -419,9 +422,9 @@ namespace EcoGenesis.EditorTools
             }
         }
 
-        private static void BuildClouds(Transform parent, int count)
+        internal static void BuildClouds(Transform parent, int count)
         {
-            Color dead = Hex("#6E7478");
+            Color dead = Hex("#9AA0A3");
             for (int i = 0; i < count; i++)
             {
                 var cloud = new GameObject("Cloud_" + i);
@@ -438,7 +441,7 @@ namespace EcoGenesis.EditorTools
             }
         }
 
-        private static void UpgradePond(GameObject pond, Transform decor)
+        internal static void UpgradePond(GameObject pond, Transform decor)
         {
             Vector3 center = new Vector3(16f, 0f, -12f);
             for (int i = 0; i < 16; i++)
@@ -480,7 +483,7 @@ namespace EcoGenesis.EditorTools
 
         // ------------------------------------------------------------------ PERSONAJES
 
-        private static void UpgradePlayer(GameObject player)
+        internal static void UpgradePlayer(GameObject player)
         {
             player.GetComponent<MeshRenderer>().enabled = false;
             Transform nose = player.transform.Find("Nose");
@@ -493,7 +496,7 @@ namespace EcoGenesis.EditorTools
             }, -1f);
         }
 
-        private static void UpgradeElena(GameObject elena)
+        internal static void UpgradeElena(GameObject elena)
         {
             elena.GetComponent<MeshRenderer>().enabled = false;
             elena.transform.rotation = Quaternion.Euler(0f, 53f, 0f);
@@ -504,7 +507,7 @@ namespace EcoGenesis.EditorTools
             }, -1f);
         }
 
-        private static void BuildMateo()
+        internal static void BuildMateo()
         {
             var mateo = new GameObject("NPC_Mateo");
             mateo.transform.position = new Vector3(7f, 1f, -6f);
@@ -528,7 +531,7 @@ namespace EcoGenesis.EditorTools
             }, -1f);
         }
 
-        private static void BuildHumanoid(Transform parent, Style s, float yOffset)
+        internal static void BuildHumanoid(Transform parent, Style s, float yOffset)
         {
             var root = new GameObject("Model").transform;
             root.SetParent(parent, false);
@@ -581,7 +584,7 @@ namespace EcoGenesis.EditorTools
         }
 
         /// <summary>Pivote en la articulación; la malla cuelga hacia abajo para poder rotarla.</summary>
-        private static Transform Limb(Transform parent, string name, Vector3 pos, Mesh mesh, Color color, float length)
+        internal static Transform Limb(Transform parent, string name, Vector3 pos, Mesh mesh, Color color, float length)
         {
             var pivot = new GameObject(name).transform;
             pivot.SetParent(parent, false);
@@ -592,7 +595,7 @@ namespace EcoGenesis.EditorTools
 
         // ------------------------------------------------------------------ CONTENEDORES Y RESIDUOS
 
-        private static void UpgradeBins(GameObject bins)
+        internal static void UpgradeBins(GameObject bins)
         {
             foreach (Transform bin in bins.transform)
             {
@@ -610,7 +613,7 @@ namespace EcoGenesis.EditorTools
             }
         }
 
-        private static void UpgradeTrash(GameObject trash)
+        internal static void UpgradeTrash(GameObject trash)
         {
             foreach (Transform item in trash.transform)
             {
@@ -644,14 +647,14 @@ namespace EcoGenesis.EditorTools
             }
         }
 
-        private static void BuildBottle(Transform p, Color glass, Color cap)
+        internal static void BuildBottle(Transform p, Color glass, Color cap)
         {
             Add(p, "Body", Frustum(0.09f, 0.09f, 0.26f, 8), glass, new Vector3(0f, -0.15f, 0f));
             Add(p, "Neck", Frustum(0.09f, 0.035f, 0.1f, 8), glass, new Vector3(0f, 0.11f, 0f));
             Add(p, "Cap", Frustum(0.04f, 0.04f, 0.04f, 6), cap, new Vector3(0f, 0.21f, 0f));
         }
 
-        private static void BuildBanana(Transform p)
+        internal static void BuildBanana(Transform p)
         {
             Color yellow = Hex("#E4C14F");
             Add(p, "PeelA", Frustum(0.06f, 0.04f, 0.28f, 6), yellow, new Vector3(-0.07f, -0.15f, 0f), null, new Vector3(0f, 0f, 22f));
@@ -659,14 +662,14 @@ namespace EcoGenesis.EditorTools
             Add(p, "Tip", Frustum(0.03f, 0.03f, 0.05f, 5), Hex("#5A4632"), new Vector3(0.18f, 0.1f, 0f), null, new Vector3(0f, 0f, -22f));
         }
 
-        private static void BuildNewspaper(Transform p)
+        internal static void BuildNewspaper(Transform p)
         {
             Add(p, "SheetA", Box(0.34f, 0.04f, 0.26f), Cream, new Vector3(0f, -0.05f, 0f), null, new Vector3(0f, 10f, 0f));
             Add(p, "SheetB", Box(0.3f, 0.045f, 0.22f), Hex("#D8D2C0"), new Vector3(0.01f, -0.02f, 0f), null, new Vector3(0f, -15f, 0f));
             Add(p, "Title", Box(0.2f, 0.05f, 0.04f), Hex("#3A3A3A"), new Vector3(0f, 0f, 0.07f), null, new Vector3(0f, -15f, 0f));
         }
 
-        private static void BuildBattery(Transform p)
+        internal static void BuildBattery(Transform p)
         {
             Add(p, "Body", Frustum(0.08f, 0.08f, 0.24f, 8), Hex("#C0392B"), new Vector3(0f, -0.14f, 0f));
             Add(p, "Band", Frustum(0.085f, 0.085f, 0.06f, 8), Hex("#2F3235"), new Vector3(0f, -0.06f, 0f));
@@ -675,7 +678,7 @@ namespace EcoGenesis.EditorTools
 
         // ------------------------------------------------------------------ LUZ Y POST-PROCESO
 
-        private static void SetupLooks(GameObject sunGo, GameObject systems)
+        internal static void SetupLooks(GameObject sunGo, GameObject systems)
         {
             sunGo.transform.rotation = Quaternion.Euler(48f, -35f, 0f);
             sunGo.GetComponent<Light>().shadows = LightShadows.Soft;
@@ -691,7 +694,7 @@ namespace EcoGenesis.EditorTools
             SetObj(restoration, "cleanVolume", clean);
         }
 
-        private static Volume MakeVolume(string name, VolumeProfile profile, float priority, float weight)
+        internal static Volume MakeVolume(string name, VolumeProfile profile, float priority, float weight)
         {
             var go = new GameObject(name);
             var volume = go.AddComponent<Volume>();
@@ -702,7 +705,7 @@ namespace EcoGenesis.EditorTools
             return volume;
         }
 
-        private static VolumeProfile MakeProfile(string name, bool polluted)
+        internal static VolumeProfile MakeProfile(string name, bool polluted)
         {
             string path = Root + "/Materials/" + name + ".asset";
             AssetDatabase.DeleteAsset(path);
@@ -711,16 +714,20 @@ namespace EcoGenesis.EditorTools
             AssetDatabase.CreateAsset(profile, path);
 
             var adjust = profile.Add<ColorAdjustments>(true);
-            adjust.saturation.Override(polluted ? -55f : 18f);
-            adjust.contrast.Override(polluted ? -8f : 8f);
-            adjust.postExposure.Override(polluted ? -0.2f : 0.25f);
-            adjust.colorFilter.Override(polluted ? Hex("#C4CACD") : Hex("#FFF4DF"));
+            adjust.saturation.Override(polluted ? -22f : 18f);
+            adjust.contrast.Override(polluted ? 0f : 10f);
+            adjust.postExposure.Override(polluted ? 0.35f : 0.3f);
+            adjust.colorFilter.Override(polluted ? Hex("#EEF0EA") : Hex("#FFF4DF"));
             AssetDatabase.AddObjectToAsset(adjust, profile);
 
             var vignette = profile.Add<Vignette>(true);
-            vignette.intensity.Override(polluted ? 0.35f : 0.12f);
+            vignette.intensity.Override(polluted ? 0.12f : 0.1f);
             vignette.smoothness.Override(0.5f);
             AssetDatabase.AddObjectToAsset(vignette, profile);
+
+            var tonemap = profile.Add<Tonemapping>(true);
+            tonemap.mode.Override(TonemappingMode.Neutral);
+            AssetDatabase.AddObjectToAsset(tonemap, profile);
 
             if (!polluted)
             {
@@ -737,7 +744,7 @@ namespace EcoGenesis.EditorTools
 
         // ------------------------------------------------------------------ AYUDAS
 
-        private static GameObject Add(Transform parent, string name, Mesh mesh, Color color, Vector3 pos,
+        internal static GameObject Add(Transform parent, string name, Mesh mesh, Color color, Vector3 pos,
             Vector3? scale = null, Vector3? euler = null)
         {
             var go = new GameObject(name);
@@ -750,32 +757,32 @@ namespace EcoGenesis.EditorTools
             return go;
         }
 
-        private static Transform Group(Transform parent, string name)
+        internal static Transform Group(Transform parent, string name)
         {
             var t = new GameObject(name).transform;
             t.SetParent(parent, false);
             return t;
         }
 
-        private static Mesh Frustum(float bottom, float top, float height, int sides, bool capBottom = true, bool capTop = true)
+        internal static Mesh Frustum(float bottom, float top, float height, int sides, bool capBottom = true, bool capTop = true)
         {
             string key = Key("fr", bottom, top, height, sides, capBottom ? 1 : 0, capTop ? 1 : 0);
             return GetMesh(key, () => LowPolyMeshes.ToMesh(LowPolyMeshes.FrustumTris(bottom, top, height, sides, capBottom, capTop), key));
         }
 
-        private static Mesh Box(float x, float y, float z)
+        internal static Mesh Box(float x, float y, float z)
         {
             string key = Key("box", x, y, z);
             return GetMesh(key, () => LowPolyMeshes.ToMesh(LowPolyMeshes.BoxTris(new Vector3(x, y, z), true), key));
         }
 
-        private static Mesh Ico(float radius, int subdivisions, float jitter, int seed)
+        internal static Mesh Ico(float radius, int subdivisions, float jitter, int seed)
         {
             string key = Key("ico", radius, subdivisions, jitter, seed);
             return GetMesh(key, () => LowPolyMeshes.ToMesh(LowPolyMeshes.IcosphereTris(radius, subdivisions, jitter, seed), key));
         }
 
-        private static string Key(string prefix, params float[] values)
+        internal static string Key(string prefix, params float[] values)
         {
             var sb = new System.Text.StringBuilder(prefix);
             foreach (float v in values)
@@ -783,7 +790,7 @@ namespace EcoGenesis.EditorTools
             return sb.ToString();
         }
 
-        private static Mesh GetMesh(string key, System.Func<Mesh> make)
+        internal static Mesh GetMesh(string key, System.Func<Mesh> make)
         {
             if (meshes.TryGetValue(key, out Mesh cached) && cached != null) return cached;
 
@@ -794,7 +801,7 @@ namespace EcoGenesis.EditorTools
             return mesh;
         }
 
-        private static Material Mat(Color color)
+        internal static Material Mat(Color color)
         {
             string hex = ColorUtility.ToHtmlStringRGB(color);
             if (materials.TryGetValue(hex, out Material cached) && cached != null) return cached;
@@ -816,7 +823,7 @@ namespace EcoGenesis.EditorTools
             return material;
         }
 
-        private static Vector3 Spot(float limit, bool avoidPaths)
+        internal static Vector3 Spot(float limit, bool avoidPaths)
         {
             for (int i = 0; i < 80; i++)
             {
@@ -826,7 +833,7 @@ namespace EcoGenesis.EditorTools
             return new Vector3(limit, 0f, limit);
         }
 
-        private static bool IsBlocked(Vector3 p, bool avoidPaths)
+        internal static bool IsBlocked(Vector3 p, bool avoidPaths)
         {
             if (p.magnitude < 4f) return true;
             if (Mathf.Abs(p.x) < 9f && Mathf.Abs(p.z - 9f) < 3.5f) return true;           // contenedores
@@ -834,21 +841,23 @@ namespace EcoGenesis.EditorTools
             if (Vector3.Distance(p, new Vector3(0f, 0f, 28f)) < 7.5f) return true;        // fuente
             if (Vector3.Distance(p, new Vector3(-4f, 0f, -3f)) < 2.5f) return true;       // Elena
             if (Vector3.Distance(p, new Vector3(7f, 0f, -6f)) < 2.5f) return true;        // Mateo
+            if (BlockZ.HasValue && Mathf.Abs(p.z - BlockZ.Value) < 7f) return true;
+            if (BlockMarket && Vector3.Distance(p, new Vector3(0f, 0f, 28f)) < 15f) return true;
             if (avoidPaths && (Mathf.Abs(p.x) < 2.2f || Mathf.Abs(p.z) < 2.2f)) return true;
             return false;
         }
 
-        private static float Range(float a, float b) => a + (float)rng.NextDouble() * (b - a);
+        internal static float Range(float a, float b) => a + (float)rng.NextDouble() * (b - a);
 
-        private static Color Darken(Color c, float f) => new Color(c.r * f, c.g * f, c.b * f, 1f);
+        internal static Color Darken(Color c, float f) => new Color(c.r * f, c.g * f, c.b * f, 1f);
 
-        private static Color Hex(string html)
+        internal static Color Hex(string html)
         {
             ColorUtility.TryParseHtmlString(html, out Color color);
             return color;
         }
 
-        private static GameObject FindRoot(Scene scene, string name)
+        internal static GameObject FindRoot(Scene scene, string name)
         {
             foreach (GameObject go in scene.GetRootGameObjects())
             {
@@ -857,7 +866,7 @@ namespace EcoGenesis.EditorTools
             return null;
         }
 
-        private static void SetObj(Object target, string field, Object value)
+        internal static void SetObj(Object target, string field, Object value)
         {
             var so = new SerializedObject(target);
             SerializedProperty p = so.FindProperty(field);
@@ -870,7 +879,7 @@ namespace EcoGenesis.EditorTools
             so.ApplyModifiedPropertiesWithoutUndo();
         }
 
-        private static void SetObjArray(Object target, string field, Object[] values)
+        internal static void SetObjArray(Object target, string field, Object[] values)
         {
             var so = new SerializedObject(target);
             SerializedProperty p = so.FindProperty(field);
@@ -880,7 +889,7 @@ namespace EcoGenesis.EditorTools
             so.ApplyModifiedPropertiesWithoutUndo();
         }
 
-        private static void EnsureFolder(string path)
+        internal static void EnsureFolder(string path)
         {
             if (AssetDatabase.IsValidFolder(path)) return;
             string parent = Path.GetDirectoryName(path).Replace('\\', '/');

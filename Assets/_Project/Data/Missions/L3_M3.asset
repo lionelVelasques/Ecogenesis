@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7fa93c4d12d031dd41987eca1eb6d314, type: 3}
+  m_Name: L3_M3
+  m_EditorClassIdentifier: Assembly-CSharp::EcoGenesis.Data.MissionData
+  missionId: l3_m3
+  title: "Cart\xF3n y vidrio"
+  description: 
+  startDialogue: Ordena el papel y el vidrio que quedaron entre los puestos.
+  completeDialogue: La plaza luce como nueva.
+  objectives:
+  - type: 1
+    anyWasteType: 0
+    wasteType: 2
+    requiredAmount: 6
+  - type: 1
+    anyWasteType: 0
+    wasteType: 3
+    requiredAmount: 4
+  sequential: 0
+  rewardPoints: 120
+  restorationBonus: 3
+  nextMission: {fileID: 0}

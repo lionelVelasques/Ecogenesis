@@ -36,13 +36,13 @@ namespace EcoGenesis.Environment
         [Header("Iluminación URP")]
         [SerializeField] private Light sun;
         [SerializeField] private Gradient sunColor = new Gradient();
-        [SerializeField] private Vector2 sunIntensityRange = new Vector2(0.6f, 1.25f);
+        [SerializeField] private Vector2 sunIntensityRange = new Vector2(1.2f, 1.55f);
         [SerializeField] private bool controlAmbient = true;
         [SerializeField] private Gradient ambientColor = new Gradient();
         [SerializeField] private bool controlFog = true;
         [SerializeField] private Gradient fogColor = new Gradient();
         [Tooltip("x = densidad contaminado, y = densidad limpio")]
-        [SerializeField] private Vector2 fogDensityRange = new Vector2(0.03f, 0.003f);
+        [SerializeField] private Vector2 fogDensityRange = new Vector2(0.007f, 0.0018f);
 
         [Header("Volumes URP (opcional)")]
         [SerializeField] private Volume pollutedVolume;
@@ -103,13 +103,15 @@ namespace EcoGenesis.Environment
             waterRenderer = water;
         }
 
-        /// <summary>Gradientes por defecto con la paleta del GDD (gris contaminado -> cálido y vivo).</summary>
+        /// <summary>Gradientes por defecto con la paleta del GDD (gris velado -> cálido y vivo).</summary>
         public void ConfigureDefaults()
         {
-            sunColor = MakeGradient(Hex("#9AA3A8"), Hex("#FFF0D0"));
-            ambientColor = MakeGradient(Hex("#4B5357"), Hex("#8FAE8B"));
-            fogColor = MakeGradient(Hex("#6B7073"), Hex("#CFE6EE"));
+            sunColor = MakeGradient(Hex("#F0EEE2"), Hex("#FFF1D6"));
+            ambientColor = MakeGradient(Hex("#B6BEC0"), Hex("#D2E6D4"));
+            fogColor = MakeGradient(Hex("#C4C9C7"), Hex("#D6EAF2"));
             waterColor = MakeGradient(Hex("#6B5A3C"), Hex("#4A91B8"));
+            sunIntensityRange = new Vector2(1.2f, 1.55f);
+            fogDensityRange = new Vector2(0.007f, 0.0018f);
         }
 
         // ---------- Aplicación visual ----------
