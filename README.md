@@ -38,3 +38,17 @@ El diseño visual y editable se desarrolla en Figma. Puedes ver el documento com
 
 ---
 *Desarrollado como proyecto de concientización ambiental.*
+
+## Niveles
+1. Parque Prototype
+2. Level 2: Río
+3. Level 3: Mercado
+
+## Controles
+- WASD: moverse
+- E: interactuar
+- Q / R: cambiar objeto de la mochila
+- Esc: pausa
+
+## Créditos
+Ver el archivo CREDITOS.md
