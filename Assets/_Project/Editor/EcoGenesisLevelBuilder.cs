@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using EcoGenesis.Audio;
 using EcoGenesis.Core;
 using EcoGenesis.Data;
 using EcoGenesis.Environment;
@@ -19,7 +20,7 @@ namespace EcoGenesis.EditorTools
     {
         private const string Root = "Assets/_Project";
         private const string MissionFolder = Root + "/Data/Missions";
-        private const float RiverZ = -24f;
+        private static float RiverZ = 16f;
 
         private sealed class Preset
         {
@@ -28,6 +29,17 @@ namespace EcoGenesis.EditorTools
             public int seed;
             public bool river;
             public bool market;
+            public float riverZ = 16f;
+            public Vector3 marketCenter = new Vector3(0f, 0f, 20f);
+            public bool removeFountain, removePond, removeCity;
+            public int keepTreesEvery = 1;
+            public Vector3 sunEuler = new Vector3(48f, -35f, 0f);
+            public bool customLook;
+            public Color groundDead = Hex("#7C8685"), groundClean = Hex("#7DB07A");
+            public Color sunDead, sunClean, ambDead, ambClean, fogDead, fogClean;
+            public Vector2 sunIntensity = new Vector2(1.2f, 1.55f), fogDensity = new Vector2(0.007f, 0.0018f);
+            public Color skyPolTint, skyCleanTint;
+            public float skyPolThick = 2.4f, skyCleanThick = 1f, skyCleanExp = 1.25f;
             public Dictionary<string, int> extraTrash = new Dictionary<string, int>();
         }
 
@@ -45,6 +57,32 @@ namespace EcoGenesis.EditorTools
             level3.extraTrash["Hazardous"] = 2; level3.extraTrash["Plastic"] = 2;
 
             // El nivel 1 va al final: Park_Prototype.unity se sobrescribe en cada construcción base.
+            // Nivel 2: mañana con neblina junto al río, sin ciudad, fuente ni estanque.
+            level2.riverZ = 16f;
+            level2.removeFountain = true; level2.removePond = true; level2.removeCity = true;
+            level2.sunEuler = new Vector3(28f, -70f, 0f);
+            level2.customLook = true;
+            level2.sunDead = Hex("#D5DCE6"); level2.sunClean = Hex("#FFF0D2");
+            level2.ambDead = Hex("#A9B6C4"); level2.ambClean = Hex("#CFE3EA");
+            level2.fogDead = Hex("#B4C2CE"); level2.fogClean = Hex("#D9ECF2");
+            level2.fogDensity = new Vector2(0.011f, 0.003f); level2.sunIntensity = new Vector2(1.1f, 1.5f);
+            level2.skyPolTint = new Color(0.58f, 0.62f, 0.70f); level2.skyCleanTint = new Color(0.5f, 0.5f, 0.5f);
+            level2.skyPolThick = 1.8f; level2.skyCleanThick = 0.9f; level2.skyCleanExp = 1.25f;
+            level2.groundDead = Hex("#9A8F78"); level2.groundClean = Hex("#79A86B");
+
+            // Nivel 3: atardecer en la plaza, con pocos árboles y un círculo de puestos.
+            level3.marketCenter = new Vector3(0f, 0f, 20f);
+            level3.removePond = true; level3.keepTreesEvery = 3;
+            level3.sunEuler = new Vector3(12f, -40f, 0f);
+            level3.customLook = true;
+            level3.sunDead = Hex("#E8C9A0"); level3.sunClean = Hex("#FFC98A");
+            level3.ambDead = Hex("#B9A88F"); level3.ambClean = Hex("#E3C9A4");
+            level3.fogDead = Hex("#CDB79B"); level3.fogClean = Hex("#F0CDA3");
+            level3.fogDensity = new Vector2(0.010f, 0.0035f); level3.sunIntensity = new Vector2(1.15f, 1.5f);
+            level3.skyPolTint = new Color(0.78f, 0.62f, 0.45f); level3.skyCleanTint = new Color(0.85f, 0.55f, 0.40f);
+            level3.skyPolThick = 2.6f; level3.skyCleanThick = 1.6f; level3.skyCleanExp = 1.1f;
+            level3.groundDead = Hex("#968C7C"); level3.groundClean = Hex("#C9B48F");
+
             Preset[] order = { level3, level2, level1 };
             for (int i = 0; i < order.Length; i++)
             {
@@ -84,7 +122,9 @@ namespace EcoGenesis.EditorTools
         private static void BuildLevel(Preset p)
         {
             Seed = p.seed;
+            RiverZ = p.riverZ;
             BlockZ = p.river ? RiverZ : (float?)null;
+            MarketCenter = p.marketCenter;
             BlockMarket = p.market;
 
             EcoGenesisProUpgrade.BuildAll();
@@ -97,10 +137,12 @@ namespace EcoGenesis.EditorTools
 
             SetFloat(systems.GetComponent<EnvironmentalManager>(), "startingHealth", 15f);
             systems.AddComponent<LevelManager>();
+            ApplyLook(scene, systems, p);
+            ApplyLayout(scene, p);
 
             BuildGroundPatches(Group(extras, "GroundPatches"), 70);
             if (p.river) BuildRiver(Group(extras, "River"), trash);
-            if (p.market) BuildMarket(Group(extras, "Market"));
+            if (p.market) { BuildMarket(Group(extras, "Market")); MoveFountain(scene); }
             AddExtraTrash(trash, p.extraTrash);
 
             if (p.index == 1) AssignMissions(elena, MakeRiverMissions());
@@ -111,6 +153,80 @@ namespace EcoGenesis.EditorTools
 
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene, p.path);
+        }
+
+        // ------------------------------------------------------------------ APARIENCIA Y DISEÑO POR NIVEL
+
+        private static void ApplyLook(Scene scene, GameObject systems, Preset p)
+        {
+            GameObject sun = FindRoot(scene, "Directional Light");
+            if (sun != null) sun.transform.rotation = Quaternion.Euler(p.sunEuler);
+            if (!p.customLook) return;
+
+            var restoration = systems.GetComponent<EnvironmentalRestoration>();
+            if (restoration != null)
+                restoration.SetLook(p.sunDead, p.sunClean, p.ambDead, p.ambClean, p.fogDead, p.fogClean, p.sunIntensity, p.fogDensity);
+
+            var sky = systems.GetComponent<SkyRestoration>();
+            if (sky != null) sky.SetLook(p.skyPolTint, p.skyCleanTint, p.skyPolThick, p.skyCleanThick, p.skyCleanExp);
+
+            GameObject ground = FindRoot(scene, "Ground");
+            if (ground != null)
+            {
+                var oldProp = ground.GetComponent<RestorationProp>();
+                if (oldProp != null) Object.DestroyImmediate(oldProp);
+                var rend = ground.GetComponent<MeshRenderer>();
+                rend.sharedMaterial = Mat(p.groundDead);
+                var rp = ground.AddComponent<RestorationProp>();
+                rp.Configure(0f, 0.9f, 1f, 1f);
+                rp.AddPart(rend, p.groundDead, p.groundClean);
+            }
+        }
+
+        private static void ApplyLayout(Scene scene, Preset p)
+        {
+            GameObject park = FindRoot(scene, "Park");
+            GameObject world = FindRoot(scene, "World");
+
+            if (p.removeFountain && park != null) DestroyChild(park.transform, "Fountain");
+            if (p.removePond)
+            {
+                GameObject pond = FindRoot(scene, "Pond");
+                if (pond != null) Object.DestroyImmediate(pond);
+                if (park != null) DestroyChild(park.transform, "PondDecor");
+            }
+            if (p.removeCity && world != null) DestroyChild(world.transform, "City");
+
+            if (p.keepTreesEvery > 1 && park != null)
+            {
+                Transform trees = park.transform.Find("Trees");
+                if (trees != null)
+                {
+                    var all = new List<Transform>();
+                    foreach (Transform t in trees) all.Add(t);
+                    for (int i = 0; i < all.Count; i++)
+                    {
+                        if (i % p.keepTreesEvery != 0) Object.DestroyImmediate(all[i].gameObject);
+                    }
+                }
+            }
+        }
+
+        private static void MoveFountain(Scene scene)
+        {
+            GameObject park = FindRoot(scene, "Park");
+            Transform fountain = park != null ? park.transform.Find("Fountain") : null;
+            if (fountain == null) return;
+
+            fountain.position = MarketCenter;
+            var audio = Object.FindFirstObjectByType<AudioDirector>();
+            if (audio != null) SetObj(audio, "waterPoint", fountain);
+        }
+
+        private static void DestroyChild(Transform parent, string childName)
+        {
+            Transform child = parent.Find(childName);
+            if (child != null) Object.DestroyImmediate(child.gameObject);
         }
 
         private static void BuildGroundPatches(Transform parent, int count)
@@ -140,6 +256,8 @@ namespace EcoGenesis.EditorTools
             var waterRp = water.AddComponent<RestorationProp>();
             waterRp.Configure(0.1f, 0.7f, 1f, 1f);
             waterRp.AddPart(water.GetComponent<MeshRenderer>(), deadWater, Blue);
+            var riverAudio = Object.FindFirstObjectByType<AudioDirector>();
+            if (riverAudio != null) SetObj(riverAudio, "waterPoint", water.transform);
 
             Color deadBank = Hex("#8A7A5F");
             foreach (float side in new[] { -1f, 1f })
@@ -212,14 +330,14 @@ namespace EcoGenesis.EditorTools
             Color[] fruit = { Hex("#D9553B"), Hex("#E8B93C"), Hex("#6FAE6B"), Hex("#C97A3A") };
             Color deadAwning = Hex("#8D9193");
             Color deadGoods = Hex("#7B745A");
-            Vector3 center = new Vector3(0f, 0f, 28f);
-            int count = 8;
+            Vector3 center = MarketCenter;
+            int count = 12;
 
             for (int i = 0; i < count; i++)
             {
                 float angle = (i / (float)count) * Mathf.PI * 2f + 0.2f;
-                Vector3 pos = new Vector3(Mathf.Sin(angle) * 10f, 0f, 28f + Mathf.Cos(angle) * 10f);
-                if (Mathf.Abs(pos.x) < 3f) continue;
+                Vector3 pos = new Vector3(center.x + Mathf.Sin(angle) * 11f, 0f, center.z + Mathf.Cos(angle) * 11f);
+                if (Mathf.Abs(pos.x - center.x) < 3f || Vector3.Angle(pos - center, Vector3.back) < 40f) continue;
 
                 var stall = new GameObject("Stall_" + i);
                 stall.transform.SetParent(parent, false);

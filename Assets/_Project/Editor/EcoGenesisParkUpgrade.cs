@@ -36,6 +36,7 @@ namespace EcoGenesis.EditorTools
         internal static int Seed = 11;
         internal static float? BlockZ;
         internal static bool BlockMarket;
+        internal static Vector3 MarketCenter = new Vector3(0f, 0f, 28f);
 
         internal sealed class Style
         {
@@ -842,7 +843,7 @@ namespace EcoGenesis.EditorTools
             if (Vector3.Distance(p, new Vector3(-4f, 0f, -3f)) < 2.5f) return true;       // Elena
             if (Vector3.Distance(p, new Vector3(7f, 0f, -6f)) < 2.5f) return true;        // Mateo
             if (BlockZ.HasValue && Mathf.Abs(p.z - BlockZ.Value) < 7f) return true;
-            if (BlockMarket && Vector3.Distance(p, new Vector3(0f, 0f, 28f)) < 15f) return true;
+            if (BlockMarket && Vector3.Distance(p, MarketCenter) < 16f) return true;
             if (avoidPaths && (Mathf.Abs(p.x) < 2.2f || Mathf.Abs(p.z) < 2.2f)) return true;
             return false;
         }
