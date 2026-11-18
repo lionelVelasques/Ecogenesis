@@ -259,7 +259,7 @@ namespace EcoGenesis.Core
             sideImage.color = new Color(0.03f, 0.09f, 0.06f, 0.94f);
             sideImage.raycastTarget = false;
 
-            UiKit.MakeLabel(p.transform, "ECOGENESIS", 132f, UiKit.Cream, TextAlignmentOptions.TopLeft, new Vector2(0f, 1f), new Vector2(110f, -110f), new Vector2(860f, 160f), FontStyles.Bold);
+            UiKit.MakeLabel(p.transform, "ECOGENESIS", 120f, UiKit.Cream, TextAlignmentOptions.TopLeft, new Vector2(0f, 1f), new Vector2(110f, -110f), new Vector2(1100f, 150f), FontStyles.Bold);
             UiKit.MakeLabel(p.transform, "Restaura el parque. Cuida el planeta.", 36f, UiKit.GreenLight, TextAlignmentOptions.TopLeft, new Vector2(0f, 1f), new Vector2(116f, -270f), new Vector2(760f, 50f));
             UiKit.MakePanel(p.transform, "Accent", new Vector2(0f, 1f), new Vector2(118f, -335f), new Vector2(190f, 7f), UiKit.Green).raycastTarget = false;
 

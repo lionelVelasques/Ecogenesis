@@ -114,6 +114,17 @@ namespace EcoGenesis.Environment
             fogDensityRange = new Vector2(0.007f, 0.0018f);
         }
 
+        /// <summary>Cambia la iluminación del nivel (hora del día, niebla, ambiente).</summary>
+        public void SetLook(Color sunDead, Color sunClean, Color ambientDead, Color ambientClean,
+            Color fogDead, Color fogClean, Vector2 sunIntensity, Vector2 fogDensity)
+        {
+            sunColor = MakeGradient(sunDead, sunClean);
+            ambientColor = MakeGradient(ambientDead, ambientClean);
+            fogColor = MakeGradient(fogDead, fogClean);
+            sunIntensityRange = sunIntensity;
+            fogDensityRange = fogDensity;
+        }
+
         // ---------- Aplicación visual ----------
 
         private void Apply(float t)

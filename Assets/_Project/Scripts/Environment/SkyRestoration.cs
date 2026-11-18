@@ -4,17 +4,31 @@ using UnityEngine;
 namespace EcoGenesis.Environment
 {
     /// <summary>
-    /// Cielo vivo: de un cielo cargado y amarillento a un cielo azul y limpio según la salud del parque.
-    /// Usa el material Skybox/Procedural (se copia para no modificar el asset original).
+    /// Cielo vivo: del cielo cargado al cielo limpio según la salud del parque. Cada nivel puede definir
+    /// sus propios colores (mañana con neblina, atardecer...). Usa Skybox/Procedural (se copia el material).
     /// </summary>
     public class SkyRestoration : MonoBehaviour
     {
         [SerializeField] private Material skySource;
         [SerializeField] private float transitionSpeed = 0.25f;
+        [SerializeField] private Color pollutedTint = new Color(0.72f, 0.64f, 0.5f);
+        [SerializeField] private Color cleanTint = new Color(0.5f, 0.5f, 0.5f);
+        [SerializeField] private float pollutedThickness = 2.4f;
+        [SerializeField] private float cleanThickness = 1f;
+        [SerializeField] private float cleanExposure = 1.25f;
 
         private Material sky;
         private float target;
         private float shown = -1f;
+
+        public void SetLook(Color pollutedSkyTint, Color cleanSkyTint, float pollutedAtmosphere, float cleanAtmosphere, float exposureClean)
+        {
+            pollutedTint = pollutedSkyTint;
+            cleanTint = cleanSkyTint;
+            pollutedThickness = pollutedAtmosphere;
+            cleanThickness = cleanAtmosphere;
+            cleanExposure = exposureClean;
+        }
 
         private void Awake()
         {
@@ -35,10 +49,10 @@ namespace EcoGenesis.Environment
             if (Mathf.Approximately(next, shown)) return;
 
             shown = next;
-            sky.SetColor("_SkyTint", Color.Lerp(new Color(0.72f, 0.64f, 0.5f), new Color(0.5f, 0.5f, 0.5f), shown));
+            sky.SetColor("_SkyTint", Color.Lerp(pollutedTint, cleanTint, shown));
             sky.SetColor("_GroundColor", Color.Lerp(new Color(0.45f, 0.45f, 0.43f), new Color(0.55f, 0.62f, 0.55f), shown));
-            sky.SetFloat("_AtmosphereThickness", Mathf.Lerp(2.4f, 1f, shown));
-            sky.SetFloat("_Exposure", Mathf.Lerp(1.0f, 1.25f, shown));
+            sky.SetFloat("_AtmosphereThickness", Mathf.Lerp(pollutedThickness, cleanThickness, shown));
+            sky.SetFloat("_Exposure", Mathf.Lerp(1.0f, cleanExposure, shown));
         }
     }
 }
