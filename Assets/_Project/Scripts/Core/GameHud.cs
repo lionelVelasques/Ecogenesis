@@ -81,19 +81,35 @@ namespace EcoGenesis.Core
             root.interactable = false;
             Transform r = canvas.transform;
 
-            // Restauración, puntos y residuos restantes
-            Image status = UiKit.MakePanel(r, "Status", new Vector2(0f, 1f), new Vector2(30f, -30f), new Vector2(560f, 196f), UiKit.Panel);
-            UiKit.MakeLabel(status.transform, "RESTAURACIÓN", 22f, UiKit.GreenLight, TextAlignmentOptions.TopLeft, new Vector2(0f, 1f), new Vector2(26f, -16f), new Vector2(300f, 30f), FontStyles.Bold);
-            percentText = UiKit.MakeLabel(status.transform, "0%", 44f, UiKit.Cream, TextAlignmentOptions.TopRight, new Vector2(1f, 1f), new Vector2(-26f, -8f), new Vector2(200f, 56f), FontStyles.Bold);
-            healthFill = UiKit.MakeBar(status.transform, "HealthBar", new Vector2(0f, 1f), new Vector2(26f, -72f), new Vector2(508f, 24f), new Color(0f, 0f, 0f, 0.45f), UiKit.Green, out healthFillImage);
-            pointsText = UiKit.MakeLabel(status.transform, "Puntos eco   0", 28f, UiKit.Cream, TextAlignmentOptions.TopLeft, new Vector2(0f, 1f), new Vector2(26f, -112f), new Vector2(508f, 36f));
-            remainingText = UiKit.MakeLabel(status.transform, "", 24f, UiKit.Soft, TextAlignmentOptions.TopLeft, new Vector2(0f, 1f), new Vector2(26f, -152f), new Vector2(508f, 32f));
+            // 1. Panel superior izquierdo: Restauración, puntos y residuos restantes
+            Image status = UiKit.MakeBorderedPanel(r, "Status", new Vector2(0f, 1f), new Vector2(30f, -30f),
+                new Vector2(480f, 186f), UiKit.CardGlass, UiKit.CardBorder, 2f);
+            UiKit.MakeIcon(status.transform, UiKit.IconLeaf, new Vector2(0f, 1f), new Vector2(24f, -18f), new Vector2(20f, 20f), UiKit.GreenLight);
+            UiKit.MakeLabel(status.transform, "RESTAURACIÓN", 20f, UiKit.GreenLight, TextAlignmentOptions.TopLeft,
+                new Vector2(0f, 1f), new Vector2(52f, -16f), new Vector2(260f, 28f), FontStyles.Bold);
+            percentText = UiKit.MakeLabel(status.transform, "0%", 38f, UiKit.Cream, TextAlignmentOptions.TopRight,
+                new Vector2(1f, 1f), new Vector2(-24f, -10f), new Vector2(140f, 48f), FontStyles.Bold);
 
-            // Misiones (la altura se ajusta sola)
-            Image missions = UiKit.MakePanel(r, "Missions", new Vector2(1f, 1f), new Vector2(-30f, -30f), new Vector2(620f, 100f), UiKit.Panel);
+            healthFill = UiKit.MakeBar(status.transform, "HealthBar", new Vector2(0f, 1f), new Vector2(24f, -66f),
+                new Vector2(432f, 20f), new Color(0f, 0f, 0f, 0.48f), UiKit.Green, out healthFillImage);
+
+            UiKit.MakePanel(status.transform, "Divider", new Vector2(0f, 1f), new Vector2(24f, -98f),
+                new Vector2(432f, 2f), new Color(1f, 1f, 1f, 0.08f)).raycastTarget = false;
+
+            pointsText = UiKit.MakeLabel(status.transform, "Puntos eco:  0", 24f, UiKit.Cream, TextAlignmentOptions.TopLeft,
+                new Vector2(0f, 1f), new Vector2(24f, -110f), new Vector2(432f, 32f), FontStyles.Bold);
+            remainingText = UiKit.MakeLabel(status.transform, "", 21f, UiKit.Soft, TextAlignmentOptions.TopLeft,
+                new Vector2(0f, 1f), new Vector2(24f, -146f), new Vector2(432f, 28f));
+
+            // 2. Panel superior derecho: Misiones (altura automática sin solaparse)
+            Image missions = UiKit.MakeBorderedPanel(r, "Missions", new Vector2(1f, 1f), new Vector2(-30f, -30f),
+                new Vector2(500f, 110f), UiKit.CardGlass, UiKit.CardBorder, 2f);
+            Transform innerMissions = missions.transform.Find("Inner");
+            if (innerMissions != null) innerMissions.gameObject.AddComponent<LayoutElement>().ignoreLayout = true;
+
             var layout = missions.gameObject.AddComponent<VerticalLayoutGroup>();
-            layout.padding = new RectOffset(24, 24, 18, 20);
-            layout.spacing = 8f;
+            layout.padding = new RectOffset(24, 24, 18, 22);
+            layout.spacing = 12f;
             layout.childControlWidth = true;
             layout.childControlHeight = true;
             layout.childForceExpandWidth = true;
@@ -101,57 +117,73 @@ namespace EcoGenesis.Core
             missions.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
             missionPanel = missions.rectTransform;
 
-            // Mochila
-            Image inventory = UiKit.MakePanel(r, "Inventory", new Vector2(0f, 0f), new Vector2(30f, 30f), new Vector2(640f, 196f), UiKit.Panel);
+            // 3. Panel inferior izquierdo: Mochila compacta (termina en X=560, lejos del botón [E])
+            Image inventory = UiKit.MakeBorderedPanel(r, "Inventory", new Vector2(0f, 0f), new Vector2(30f, 30f),
+                new Vector2(530f, 178f), UiKit.CardGlass, UiKit.CardBorder, 2f);
             inventoryPanel = inventory.rectTransform;
-            UiKit.MakeLabel(inventoryPanel, "MOCHILA", 22f, UiKit.GreenLight, TextAlignmentOptions.TopLeft, new Vector2(0f, 1f), new Vector2(26f, -16f), new Vector2(300f, 30f), FontStyles.Bold);
-            countText = UiKit.MakeLabel(inventoryPanel, "", 22f, UiKit.Cream, TextAlignmentOptions.TopRight, new Vector2(1f, 1f), new Vector2(-26f, -16f), new Vector2(200f, 30f));
-            selectedText = UiKit.MakeLabel(inventoryPanel, "", 24f, UiKit.Cream, TextAlignmentOptions.TopLeft, new Vector2(0f, 1f), new Vector2(26f, -160f), new Vector2(590f, 30f));
+            UiKit.MakeIcon(inventoryPanel, UiKit.IconGrid, new Vector2(0f, 1f), new Vector2(24f, -18f), new Vector2(18f, 18f), UiKit.GreenLight);
+            UiKit.MakeLabel(inventoryPanel, "MOCHILA", 20f, UiKit.GreenLight, TextAlignmentOptions.TopLeft,
+                new Vector2(0f, 1f), new Vector2(50f, -16f), new Vector2(240f, 28f), FontStyles.Bold);
+            countText = UiKit.MakeLabel(inventoryPanel, "0 / 6", 21f, UiKit.Cream, TextAlignmentOptions.TopRight,
+                new Vector2(1f, 1f), new Vector2(-24f, -16f), new Vector2(140f, 28f), FontStyles.Bold);
+            selectedText = UiKit.MakeLabel(inventoryPanel, "Mochila vacía", 21f, UiKit.Soft, TextAlignmentOptions.TopLeft,
+                new Vector2(0f, 1f), new Vector2(24f, -140f), new Vector2(482f, 28f));
             EnsureSlots(6);
 
-            // Indicación de interacción
-            Image pill = UiKit.MakePanel(r, "Prompt", new Vector2(0.5f, 0f), new Vector2(0f, 150f), new Vector2(720f, 84f), UiKit.Panel);
+            // 4. Indicación de interacción [E] centrada sin tocar la mochila
+            Image pill = UiKit.MakeBorderedPanel(r, "Prompt", new Vector2(0.5f, 0f), new Vector2(0f, 108f),
+                new Vector2(520f, 68f), UiKit.PanelSolid, UiKit.CardBorder, 2f);
             promptPill = pill.gameObject;
-            Image key = UiKit.MakePanel(pill.transform, "Key", new Vector2(0f, 0.5f), new Vector2(22f, 0f), new Vector2(56f, 56f), UiKit.Blue);
-            UiKit.MakeLabel(key.transform, "E", 34f, Color.white, TextAlignmentOptions.Center, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(56f, 56f), FontStyles.Bold);
-            promptText = UiKit.MakeLabel(pill.transform, "", 34f, UiKit.Cream, TextAlignmentOptions.Left, new Vector2(0f, 0.5f), new Vector2(100f, 0f), new Vector2(600f, 60f));
+            Image key = UiKit.MakePanel(pill.transform, "Key", new Vector2(0f, 0.5f), new Vector2(14f, 0f), new Vector2(44f, 44f), UiKit.Blue);
+            UiKit.MakeLabel(key.transform, "E", 26f, Color.white, TextAlignmentOptions.Center, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(44f, 44f), FontStyles.Bold);
+            promptText = UiKit.MakeLabel(pill.transform, "", 25f, UiKit.Cream, TextAlignmentOptions.Left,
+                new Vector2(0f, 0.5f), new Vector2(74f, 0f), new Vector2(424f, 48f), FontStyles.Bold);
+            promptText.textWrappingMode = TextWrappingModes.NoWrap;
             promptPill.SetActive(false);
 
-            // Avisos
-            Image toast = UiKit.MakePanel(r, "Toast", new Vector2(0.5f, 1f), new Vector2(0f, -40f), new Vector2(1100f, 92f), UiKit.Panel);
+            // 5. Avisos y diálogos centrados en el espacio libre entre Restauración y Misiones
+            Image toast = UiKit.MakeBorderedPanel(r, "Toast", new Vector2(0.5f, 1f), new Vector2(0f, -30f),
+                new Vector2(780f, 86f), UiKit.PanelSolid, UiKit.CardBorder, 2f);
             toastGroup = toast.gameObject.AddComponent<CanvasGroup>();
             toastGroup.alpha = 0f;
-            toastText = UiKit.MakeLabel(toast.transform, "", 30f, UiKit.Cream, TextAlignmentOptions.Center, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(1040f, 80f));
+            Image toastBadge = UiKit.MakePanel(toast.transform, "Badge", new Vector2(0f, 0.5f), new Vector2(18f, 0f),
+                new Vector2(44f, 44f), new Color(0.14f, 0.30f, 0.21f, 0.9f));
+            UiKit.MakeIcon(toastBadge.transform, UiKit.IconInfo, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(24f, 24f), UiKit.GreenLight);
+            toastText = UiKit.MakeLabel(toast.transform, "", 23f, UiKit.Cream, TextAlignmentOptions.Left,
+                new Vector2(0f, 0.5f), new Vector2(78f, 0f), new Vector2(676f, 68f));
 
-            // Banner de nivel
+            // 6. Banner de inicio de nivel
             RectTransform banner = UiKit.Stretch(r, "Banner");
             bannerGroup = banner.gameObject.AddComponent<CanvasGroup>();
             bannerGroup.alpha = 0f;
-            bannerTitle = UiKit.MakeLabel(banner, "", 96f, UiKit.Cream, TextAlignmentOptions.Center, new Vector2(0.5f, 0.5f), new Vector2(0f, 150f), new Vector2(1500f, 130f), FontStyles.Bold);
-            bannerSubtitle = UiKit.MakeLabel(banner, "", 40f, UiKit.GreenLight, TextAlignmentOptions.Center, new Vector2(0.5f, 0.5f), new Vector2(0f, 70f), new Vector2(1500f, 60f));
+            bannerTitle = UiKit.MakeLabel(banner, "", 92f, UiKit.Cream, TextAlignmentOptions.Center, new Vector2(0.5f, 0.5f), new Vector2(0f, 150f), new Vector2(1500f, 130f), FontStyles.Bold);
+            bannerSubtitle = UiKit.MakeLabel(banner, "", 38f, UiKit.GreenLight, TextAlignmentOptions.Center, new Vector2(0.5f, 0.5f), new Vector2(0f, 70f), new Vector2(1500f, 60f));
 
-            // Mira
-            UiKit.MakeCircle(r, "Crosshair", new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(10f, 10f), new Color(0.91f, 0.85f, 0.71f, 0.8f));
+            // 7. Mira central
+            UiKit.MakeCircle(r, "Crosshair", new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(9f, 9f), new Color(0.95f, 0.90f, 0.79f, 0.85f));
 
             OnMissions(null);
         }
 
         private void EnsureSlots(int count)
         {
+            if (count > 6 && inventoryPanel != null)
+                inventoryPanel.sizeDelta = new Vector2(48f + count * 82f - 10f, 178f);
+
             while (slots.Count < count)
             {
                 int i = slots.Count;
-                RectTransform rt = UiKit.Rect(inventoryPanel, "Slot" + i, new Vector2(0f, 1f), new Vector2(26f + i * 96f, -64f), new Vector2(84f, 84f));
+                RectTransform rt = UiKit.Rect(inventoryPanel, "Slot" + i, new Vector2(0f, 1f), new Vector2(24f + i * 82f, -56f), new Vector2(72f, 72f));
                 var slot = new Slot();
-                slot.border = UiKit.MakePanel(rt, "Border", new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(94f, 94f), UiKit.Gold);
+                slot.border = UiKit.MakePanel(rt, "Border", new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(80f, 80f), UiKit.Gold);
                 slot.border.raycastTarget = false;
                 slot.border.gameObject.SetActive(false);
-                Image bg = UiKit.MakePanel(rt, "Bg", new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(84f, 84f), new Color(0f, 0f, 0f, 0.5f));
+                Image bg = UiKit.MakePanel(rt, "Bg", new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(72f, 72f), new Color(0f, 0f, 0f, 0.5f));
                 bg.raycastTarget = false;
-                slot.chip = UiKit.MakePanel(rt, "Chip", new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(58f, 58f), Color.white);
+                slot.chip = UiKit.MakePanel(rt, "Chip", new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(48f, 48f), Color.white);
                 slot.chip.raycastTarget = false;
                 slot.chip.gameObject.SetActive(false);
-                slot.letter = UiKit.MakeLabel(rt, "", 30f, UiKit.Ink, TextAlignmentOptions.Center, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(84f, 84f), FontStyles.Bold);
+                slot.letter = UiKit.MakeLabel(rt, "", 26f, UiKit.Ink, TextAlignmentOptions.Center, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(72f, 72f), FontStyles.Bold);
                 slots.Add(slot);
             }
         }
@@ -197,7 +229,7 @@ namespace EcoGenesis.Core
 
             countText.text = inventory.Items.Count + " / " + inventory.Capacity;
             TrashData selected = inventory.Selected;
-            selectedText.text = selected != null ? selected.displayName + "  ·  " + selected.wasteType.DisplayName() + "   (Q / R: cambiar)" : "Mochila vacía";
+            selectedText.text = selected != null ? selected.displayName + " · " + selected.wasteType.DisplayName() + " (Q/R)" : "Mochila vacía";
         }
 
         private void OnMissions(IReadOnlyList<MissionRuntime> active)
@@ -205,16 +237,17 @@ namespace EcoGenesis.Core
             foreach (GameObject row in missionRows) Destroy(row);
             missionRows.Clear();
 
-            AddMissionText("MISIONES", 22f, UiKit.GreenLight, FontStyles.Bold);
+            AddMissionHeader();
+
             if (active == null || active.Count == 0)
             {
-                AddMissionText("Habla con Elena para recibir una misión.", 24f, UiKit.Cream, FontStyles.Normal);
+                AddMissionText("Habla con Elena para recibir una misión.", 22f, UiKit.Cream, FontStyles.Normal, 32f);
                 return;
             }
 
             foreach (MissionRuntime mission in active)
             {
-                AddMissionText(mission.Data.title, 28f, UiKit.Cream, FontStyles.Bold);
+                AddMissionText(mission.Data.title, 25f, UiKit.Cream, FontStyles.Bold, 34f);
                 for (int i = 0; i < mission.Data.objectives.Count; i++)
                 {
                     MissionObjective objective = mission.Data.objectives[i];
@@ -225,10 +258,23 @@ namespace EcoGenesis.Core
             }
         }
 
-        private void AddMissionText(string text, float size, Color color, FontStyles style)
+        private void AddMissionHeader()
         {
-            var go = new GameObject("Row", typeof(RectTransform));
+            var go = new GameObject("Header", typeof(RectTransform), typeof(LayoutElement));
             go.transform.SetParent(missionPanel, false);
+            go.GetComponent<LayoutElement>().preferredHeight = 26f;
+            missionRows.Add(go);
+
+            UiKit.MakeIcon(go.transform, UiKit.IconLeaf, new Vector2(0f, 0.5f), Vector2.zero, new Vector2(18f, 18f), UiKit.GreenLight);
+            UiKit.MakeLabel(go.transform, "MISIONES", 20f, UiKit.GreenLight, TextAlignmentOptions.Left,
+                new Vector2(0f, 0.5f), new Vector2(26f, 0f), new Vector2(300f, 26f), FontStyles.Bold);
+        }
+
+        private void AddMissionText(string text, float size, Color color, FontStyles style, float minHeight)
+        {
+            var go = new GameObject("Row", typeof(RectTransform), typeof(LayoutElement));
+            go.transform.SetParent(missionPanel, false);
+            go.GetComponent<LayoutElement>().minHeight = minHeight;
             var t = go.AddComponent<TextMeshProUGUI>();
             t.text = text;
             t.fontSize = size;
@@ -242,13 +288,13 @@ namespace EcoGenesis.Core
         {
             var go = new GameObject("Objective", typeof(RectTransform), typeof(LayoutElement));
             go.transform.SetParent(missionPanel, false);
-            go.GetComponent<LayoutElement>().preferredHeight = 54f;
+            go.GetComponent<LayoutElement>().preferredHeight = 52f;
             missionRows.Add(go);
 
             Color color = done ? UiKit.GreenLight : UiKit.Cream;
-            UiKit.MakeLabel(go.transform, text, 22f, color, TextAlignmentOptions.TopLeft, new Vector2(0f, 1f), Vector2.zero, new Vector2(500f, 28f));
-            UiKit.MakeLabel(go.transform, progress + " / " + total, 22f, color, TextAlignmentOptions.TopRight, new Vector2(1f, 1f), Vector2.zero, new Vector2(100f, 28f));
-            RectTransform fill = UiKit.MakeBar(go.transform, "Bar", new Vector2(0f, 0f), Vector2.zero, new Vector2(572f, 10f), new Color(0f, 0f, 0f, 0.45f), done ? UiKit.GreenLight : UiKit.Blue, out Image _);
+            UiKit.MakeLabel(go.transform, text, 20f, color, TextAlignmentOptions.TopLeft, new Vector2(0f, 1f), Vector2.zero, new Vector2(365f, 30f));
+            UiKit.MakeLabel(go.transform, progress + " / " + total, 20f, color, TextAlignmentOptions.TopRight, new Vector2(1f, 1f), Vector2.zero, new Vector2(80f, 30f), FontStyles.Bold);
+            RectTransform fill = UiKit.MakeBar(go.transform, "Bar", new Vector2(0f, 0f), Vector2.zero, new Vector2(452f, 9f), new Color(0f, 0f, 0f, 0.48f), done ? UiKit.GreenLight : UiKit.Blue, out Image _);
             UiKit.SetBar(fill, total > 0 ? (float)progress / total : 1f);
         }
 
@@ -268,13 +314,13 @@ namespace EcoGenesis.Core
                 float speed = Mathf.Max(40f, Mathf.Abs(points - shownPoints) * 4f);
                 shownPoints = (int)Mathf.MoveTowards(shownPoints, points, speed * dt);
             }
-            pointsText.text = "Puntos eco   " + shownPoints;
+            pointsText.text = "Puntos eco:  " + shownPoints;
 
             remainingTimer -= dt;
             if (remainingTimer <= 0f)
             {
                 remainingTimer = 0.7f;
-                int remaining = FindObjectsByType<TrashItem>(FindObjectsSortMode.None).Length;
+                int remaining = FindObjectsByType<TrashItem>().Length;
                 remainingText.text = remaining > 0 ? "Residuos en el parque:  " + remaining : "¡El parque está limpio!";
             }
 
