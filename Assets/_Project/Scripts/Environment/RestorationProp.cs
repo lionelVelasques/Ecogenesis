@@ -49,6 +49,11 @@ namespace EcoGenesis.Environment
         private bool dirty = true;
         private bool renderersVisible = true;
 
+        // Si este objeto es la mitad de un par "seco <-> vivo" (árboles), la transición se escalona:
+        // primero se encoge el seco y después crece el vivo, en vez de cambiar los dos a la vez.
+        private float stageFrom;
+        private float stageTo = 1f;
+
         // ---------- API de configuración por código (la usa la herramienta del editor) ----------
 
         public void Configure(float start, float full, float pollutedSize, float cleanSize)
@@ -76,6 +81,28 @@ namespace EcoGenesis.Environment
             baseScale = transform.localScale;
             block = new MaterialPropertyBlock();
             allRenderers = GetComponentsInChildren<Renderer>(true);
+            DetectStagedPair();
+        }
+
+        private void DetectStagedPair()
+        {
+            Transform parent = transform.parent;
+            if (parent == null) return;
+
+            foreach (Transform sibling in parent)
+            {
+                if (sibling == transform) continue;
+                RestorationProp partner = sibling.GetComponent<RestorationProp>();
+                if (partner == null) continue;
+
+                bool iFade = cleanScale < pollutedScale;
+                bool iGrow = cleanScale > pollutedScale;
+                bool partnerFades = partner.cleanScale < partner.pollutedScale;
+                bool partnerGrows = partner.cleanScale > partner.pollutedScale;
+
+                if (iFade && partnerGrows) { stageFrom = 0f; stageTo = 0.45f; return; }
+                if (iGrow && partnerFades) { stageFrom = 0.4f; stageTo = 1f; return; }
+            }
         }
 
         private void OnEnable() => GameEvents.HealthChanged += OnHealthChanged;
@@ -98,6 +125,7 @@ namespace EcoGenesis.Environment
 
         private void Apply(float t)
         {
+            if (stageTo > stageFrom) t = Mathf.Clamp01(Mathf.InverseLerp(stageFrom, stageTo, t));
             float eased = t * t * (3f - 2f * t);
 
             float scale = Mathf.Lerp(pollutedScale, cleanScale, eased);
