@@ -1,5 +1,6 @@
 using EcoGenesis.Core;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace EcoGenesis.Player
 {
@@ -24,6 +25,16 @@ namespace EcoGenesis.Player
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Bootstrap()
         {
+            // El menú recarga la escena con LoadScene, que destruye este objeto: se vuelve a crear en cada carga.
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+            SceneManager.sceneLoaded += OnSceneLoaded;
+            Spawn();
+        }
+
+        private static void OnSceneLoaded(Scene scene, LoadSceneMode mode) => Spawn();
+
+        private static void Spawn()
+        {
             if (FindFirstObjectByType<VoidGuard>() != null) return;
             new GameObject("VoidGuard").AddComponent<VoidGuard>();
         }
@@ -35,8 +46,6 @@ namespace EcoGenesis.Player
                 player = FindFirstObjectByType<PlayerController>();
                 if (player == null) return;
                 controller = player.GetComponent<CharacterController>();
-                lastSafe = player.transform.position;
-                hasSafe = true;
             }
 
             Vector3 pos = player.transform.position;
