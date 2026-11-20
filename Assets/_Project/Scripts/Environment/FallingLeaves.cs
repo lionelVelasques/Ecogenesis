@@ -74,7 +74,7 @@ namespace EcoGenesis.Environment
             sway.space = ParticleSystemSimulationSpace.World;
             sway.x = new ParticleSystem.MinMaxCurve(-0.5f, 0.5f);
             sway.z = new ParticleSystem.MinMaxCurve(-0.5f, 0.5f);
-            sway.y = new ParticleSystem.MinMaxCurve(-0.15f);
+            sway.y = new ParticleSystem.MinMaxCurve(-0.2f, -0.1f);
 
             var particleRenderer = system.GetComponent<ParticleSystemRenderer>();
             Shader shader = Shader.Find("Sprites/Default");
