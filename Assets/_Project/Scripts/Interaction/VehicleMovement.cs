@@ -19,10 +19,8 @@ public class AutoEnMovimiento : MonoBehaviour
     {
         if (puntoInicio == null || puntoFin == null) return;
 
-        // Mueve el objeto hacia el punto final
         transform.position = Vector3.MoveTowards(transform.position, puntoFin.position, velocidad * Time.deltaTime);
 
-        // Cuando llega al final, vuelve al inicio y cambia a otro carro distinto
         if (Vector3.Distance(transform.position, puntoFin.position) < 0.2f)
         {
             ReiniciarAuto();
@@ -37,7 +35,6 @@ public class AutoEnMovimiento : MonoBehaviour
             if (puntoFin != null) transform.LookAt(puntoFin);
         }
 
-        // Apaga todos los modelos y enciende solo uno al azar
         if (modelosAutos != null && modelosAutos.Length > 0)
         {
             int indiceAleatorio = Random.Range(0, modelosAutos.Length);
