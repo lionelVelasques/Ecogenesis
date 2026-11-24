@@ -81215,7 +81215,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AutoEnMovimiento
   puntoInicio: {fileID: 1078173027}
   puntoFin: {fileID: 472883066}
-  velocidad: 20
+  velocidad: 25
   modelosAutos:
   - {fileID: -894679203148458699, guid: 4f5ca0b40d1a1d54cb2ce647b2189154, type: 3}
   - {fileID: 2786733526305945106, guid: 4a8bf7dec0f4fb6428434ead6275725f, type: 3}
@@ -129698,7 +129698,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AutoEnMovimiento
   puntoInicio: {fileID: 2142701124}
   puntoFin: {fileID: 565179716}
-  velocidad: 20
+  velocidad: 22
   modelosAutos:
   - {fileID: 207619918}
 --- !u!1 &1462816352
