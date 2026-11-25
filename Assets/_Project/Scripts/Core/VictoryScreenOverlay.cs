@@ -1,6 +1,7 @@
 using System.Collections;
 using EcoGenesis.Environment;
 using EcoGenesis.Interaction;
+using EcoGenesis.Player;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -180,25 +181,23 @@ namespace EcoGenesis.Core
             // Botón: Siguiente Nivel (Ribera del Mantaro)
             nextLevelBtn = UiKit.MakeButton(
                 panelRect,
-                "NextLevelBtn",
                 "Siguiente Nivel: Ribera del Mantaro ➔",
                 new Vector2(0.5f, 0f),
                 new Vector2(0f, 100f),
                 new Vector2(480f, 54f),
-                UiKit.GreenVibrant,
-                AvanzarSiguienteNivel
+                AvanzarSiguienteNivel,
+                UiKit.GreenVibrant
             );
 
             // Botón: Repetir nivel
             replayBtn = UiKit.MakeButton(
                 panelRect,
-                "ReplayBtn",
                 "Volver a Jugar el Parque",
                 new Vector2(0.5f, 0f),
                 new Vector2(0f, 38f),
                 new Vector2(480f, 46f),
-                new Color(0.12f, 0.22f, 0.17f, 0.95f),
-                ReiniciarNivel
+                ReiniciarNivel,
+                new Color(0.12f, 0.22f, 0.17f, 0.95f)
             );
         }
 
