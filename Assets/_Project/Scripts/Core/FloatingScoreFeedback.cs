@@ -208,7 +208,7 @@ namespace EcoGenesis.Core
             Vector3 basePos = player != null ? player.transform.position + Vector3.up * 1.8f : Vector3.zero;
 
             // Si hay un contenedor de basura muy cerca del jugador, usar la parte superior del contenedor
-            var bins = FindObjectsByType<BinController>(FindObjectsSortMode.None);
+            var bins = FindObjectsByType<BinController>();
             float closestDist = 3.5f;
             foreach (var bin in bins)
             {

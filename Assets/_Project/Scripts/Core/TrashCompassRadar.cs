@@ -73,7 +73,7 @@ namespace EcoGenesis.Core
 
         private void RegistrarConteoInicial()
         {
-            var items = FindObjectsByType<TrashItem>(FindObjectsSortMode.None);
+            var items = FindObjectsByType<TrashItem>();
             initialTrashCount = items.Length;
             remainingTrashCount = initialTrashCount;
             hasInitializedCounts = true;
@@ -218,7 +218,7 @@ namespace EcoGenesis.Core
         private void BuscarResiduoMasCercano()
         {
             Vector3 playerPos = player.transform.position;
-            var items = FindObjectsByType<TrashItem>(FindObjectsSortMode.None);
+            var items = FindObjectsByType<TrashItem>();
 
             closestTrash = null;
             closestDistance = float.MaxValue;

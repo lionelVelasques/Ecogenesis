@@ -212,7 +212,7 @@ namespace EcoGenesis.Core
             checkTimer = 0.5f;
 
             // Condición de victoria: 0 residuos en suelo y mochila vacía, o salud >= 98%
-            int remainingTrash = FindObjectsByType<TrashItem>(FindObjectsSortMode.None).Length;
+            int remainingTrash = FindObjectsByType<TrashItem>().Length;
             bool mochilaVacia = inventory == null || inventory.Items.Count == 0;
             float health = environment != null ? environment.Health01 : 0f;
 
@@ -238,7 +238,7 @@ namespace EcoGenesis.Core
             Cursor.lockState = CursorLockMode.None;
 
             // Desactivar movimiento del personaje
-            var input = FindFirstObjectByType<PlayerInputReader>();
+            var input = FindAnyObjectByType<PlayerInputReader>();
             if (input != null) input.InputEnabled = false;
 
             // Calcular estadísticas

@@ -158,7 +158,7 @@ namespace EcoGenesis.Interaction
             // Si no hay un objeto en foco directo, buscar el residuo más cercano en el cono visual
             if (bestTarget == null)
             {
-                var trashItems = FindObjectsByType<TrashItem>(FindObjectsSortMode.None);
+                var trashItems = FindObjectsByType<TrashItem>();
                 foreach (var trash in trashItems)
                 {
                     if (trash == null || !trash.gameObject.activeInHierarchy) continue;
