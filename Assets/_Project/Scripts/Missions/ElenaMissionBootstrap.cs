@@ -35,35 +35,55 @@ namespace EcoGenesis.Missions
             var giver = elenaGO.GetComponent<MissionGiver>();
             if (giver == null) giver = elenaGO.AddComponent<MissionGiver>();
 
-            // Crear la misión educativa de recojo de plástico
-            var misionPlastico = ScriptableObject.CreateInstance<MissionData>();
-            misionPlastico.missionId = "mision_elena_plastico_huancayo";
-            misionPlastico.title = "Limpieza de Plásticos";
-            misionPlastico.description = "Ayuda a Elena a recolectar 4 residuos plásticos en el parque";
-            misionPlastico.startDialogue = "¡Hola! El parque está descuidado. Ayúdame a recolectar 4 plásticos para limpiar los jardines.";
-            misionPlastico.completeDialogue = "¡Excelente trabajo! Gracias a ti el parque se ve mucho más limpio. ¡Toma 50 puntos extra!";
-            misionPlastico.rewardPoints = 50;
-            misionPlastico.restorationBonus = 3.5f;
+            var offeredField = typeof(MissionGiver).GetField("offered", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            var missionsField = typeof(MissionGiver).GetField("missions", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
 
+            if (missionsField != null && missionsField.GetValue(giver) == null)
+            {
+                missionsField.SetValue(giver, manager);
+            }
+
+            // Si el MissionGiver ya tiene configuradas misiones en la escena (ej. Mission_01_Plasticos con sus 2 objetivos), respetarlas
+            if (offeredField != null)
+            {
+                var existing = offeredField.GetValue(giver) as MissionData[];
+                if (existing != null && existing.Length > 0 && existing[0] != null)
+                {
+                    return; // Mantiene la misión original completa con sus 2 tareas
+                }
+            }
+
+            // Misión de respaldo con los DOS objetivos completos: 1) Recolectar y 2) Clasificar
+            var misionPlastico = ScriptableObject.CreateInstance<MissionData>();
+            misionPlastico.missionId = "m01_bootstrap";
+            misionPlastico.title = "Primer día en el parque";
+            misionPlastico.description = "Ayuda a Elena a recolectar y clasificar los residuos plásticos";
+            misionPlastico.startDialogue = "Hola, soy Elena. Empecemos por los plásticos: recoge tres botellas y deposítalas en el contenedor blanco.";
+            misionPlastico.completeDialogue = "¡Excelente trabajo! Así se empieza.";
+            misionPlastico.rewardPoints = 50;
+            misionPlastico.restorationBonus = 2f;
+
+            // Objetivo 1: Recolectar 3 plásticos
             misionPlastico.objectives.Add(new MissionObjective
             {
                 type = ObjectiveType.CollectTrash,
                 anyWasteType = false,
                 wasteType = WasteType.Plastic,
-                requiredAmount = 4
+                requiredAmount = 3
             });
 
-            // Asignar al MissionGiver mediante reflexión para no alterar los campos privados
-            var offeredField = typeof(MissionGiver).GetField("offered", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            // Objetivo 2: Depositar 3 plásticos en el contenedor correspondiente
+            misionPlastico.objectives.Add(new MissionObjective
+            {
+                type = ObjectiveType.SortCorrectly,
+                anyWasteType = false,
+                wasteType = WasteType.Plastic,
+                requiredAmount = 3
+            });
+
             if (offeredField != null)
             {
                 offeredField.SetValue(giver, new[] { misionPlastico });
-            }
-
-            var missionsField = typeof(MissionGiver).GetField("missions", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            if (missionsField != null)
-            {
-                missionsField.SetValue(giver, manager);
             }
         }
     }
