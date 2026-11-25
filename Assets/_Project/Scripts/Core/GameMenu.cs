@@ -71,6 +71,10 @@ namespace EcoGenesis.Core
         {
             if (hud != null) hud.SetVisible(false);
 
+#if UNITY_EDITOR
+            // En el editor de Unity, iniciar directamente la partida para probar sin trabas
+            StartCoroutine(BeginPlay(false, false));
+#else
             if (PlayerPrefs.GetInt(AutoStartKey, 0) == 1)
             {
                 bool load = PlayerPrefs.GetInt(LoadKey, 0) == 1;
@@ -84,6 +88,7 @@ namespace EcoGenesis.Core
                 ShowPanel(mainPanel);
                 StartCoroutine(Fade(0f, 1.2f));
             }
+#endif
         }
 
         private void Update()
