@@ -185,10 +185,16 @@ namespace EcoGenesis.Interaction
             currentTarget = bestTarget;
             actionText.text = prompt;
 
-            // Altura relativa según si es residuo (pequeño en suelo), contenedor o NPC (por encima de la cabeza)
+            // Altura dinámica precisa: 25cm por encima del punto más alto del collider del objeto
             float yOffset = 0.55f;
-            if (currentTarget.GetComponent<BinController>() != null) yOffset = 1.35f;
-            else if (currentTarget.GetComponent<NpcTalker>() != null || currentTarget.GetComponent<MissionGiver>() != null || currentTarget.name.StartsWith("NPC_")) yOffset = 2.35f;
+            var col = currentTarget.GetComponent<Collider>();
+            if (col != null)
+            {
+                float topY = col.bounds.max.y - currentTarget.position.y;
+                yOffset = Mathf.Max(0.5f, topY + 0.25f);
+            }
+            else if (currentTarget.GetComponent<BinController>() != null) yOffset = 1.25f;
+            else if (currentTarget.name.StartsWith("NPC_")) yOffset = 1.75f;
 
             // Flotación suave animada
             float hoverBob = Mathf.Sin(Time.time * 3.2f) * 0.04f;
