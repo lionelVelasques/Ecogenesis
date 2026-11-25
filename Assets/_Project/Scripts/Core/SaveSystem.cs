@@ -102,7 +102,7 @@ namespace EcoGenesis.Core
                 playerYaw = player.transform.eulerAngles.y
             };
 
-            foreach (TrashItem item in FindObjectsByType<TrashItem>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+            foreach (TrashItem item in FindObjectsByType<TrashItem>(FindObjectsInactive.Include))
             {
                 if (!item.gameObject.activeSelf) data.collected.Add(item.name);
             }
@@ -125,7 +125,7 @@ namespace EcoGenesis.Core
             if (data == null) return false;
 
             var collected = new HashSet<string>(data.collected);
-            foreach (TrashItem item in FindObjectsByType<TrashItem>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+            foreach (TrashItem item in FindObjectsByType<TrashItem>(FindObjectsInactive.Include))
             {
                 if (collected.Contains(item.name)) item.gameObject.SetActive(false);
             }

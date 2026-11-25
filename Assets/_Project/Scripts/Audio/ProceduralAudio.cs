@@ -195,10 +195,20 @@ namespace EcoGenesis.Audio
 
         public static AudioClip Pickup()
         {
-            var d = new float[(int)(0.3f * Rate)];
-            Bell(d, 0f, Hz(79), 0.25f, 0.5f);
-            Bell(d, 0.07f, Hz(84), 0.22f, 0.5f);
-            return Make("Pickup", d, 0.7f);
+            var d = new float[(int)(0.22f * Rate)];
+            for (int i = 0; i < d.Length; i++)
+            {
+                float t = (float)i / Rate;
+                // Pop táctil de recojo (burbuja / crujido ascendente muy satisfactorio)
+                float env = Mathf.Exp(-t * 26f);
+                float freq = Mathf.Lerp(160f, 740f, Mathf.Sqrt(Mathf.Clamp01(t / 0.10f)));
+                float wave = Mathf.Sin(2f * Mathf.PI * freq * t) * 0.75f
+                           + Mathf.Sin(2f * Mathf.PI * freq * 1.5f * t) * 0.25f;
+                d[i] = wave * env * 0.85f;
+            }
+            // Campana brillante suave de confirmación
+            Bell(d, 0.035f, Hz(83), 0.18f, 0.45f);
+            return Make("Pickup", d, 0.95f);
         }
 
         public static AudioClip Correct()

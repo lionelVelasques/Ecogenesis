@@ -149,7 +149,11 @@ namespace EcoGenesis.Audio
             stepTimer = Mathf.Lerp(0.55f, 0.33f, speed);
         }
 
-        private void OnTrashCollected(TrashData data) => PlaySfx(pickup, 0.8f);
+        private void OnTrashCollected(TrashData data)
+        {
+            if (sfx != null) sfx.pitch = Random.Range(0.96f, 1.06f);
+            PlaySfx(pickup, 1.0f);
+        }
         private void OnTrashSorted(TrashData data, bool isCorrect) => PlaySfx(isCorrect ? correct : wrong, isCorrect ? 0.7f : 0.8f);
         private void OnMissionCompleted(MissionData data) => PlaySfx(mission, 0.9f);
         private void OnHealthChanged(float health01) => health = health01;
